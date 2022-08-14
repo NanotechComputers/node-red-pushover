@@ -215,22 +215,6 @@ module.exports = function (RED) {
                             node.error('Error parsing json: ' + error.message);
                         }
                     })
-
-                /*fetch(pushoverAPI, {method: 'POST', body: form})
-                    .then(checkFetchStatus)
-                    .then(res => {
-                        node.log('pushover POST succeeded:\n' + JSON.stringify(res));
-                        if (done) {
-                            done();
-                        }
-                    })
-                    .catch(error => {
-                        if (done) {
-                            done(error.message);
-                        } else {
-                            node.error('Error parsing json: ' + error.message);
-                        }
-                    })*/
             }
 
             if (Object.keys(glances).length > 2) {
