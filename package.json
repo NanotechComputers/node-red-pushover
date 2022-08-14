@@ -13,14 +13,14 @@
     "notification"
   ],
   "node-red": {
-    "version": ">=3.0.0",
+    "version": ">=2.2.2",
     "nodes": {
       "pushover": "pushover.js"
     }
   },
   "engines": {
     "node": ">=12.22.2",
-    "npm": ">=6.14.13"
+    "npm": ">=6.14.14"
   },
   "author": {
     "name": "Nanotech Computers",
