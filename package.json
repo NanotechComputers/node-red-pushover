@@ -1,6 +1,6 @@
 {
   "name": "@nanotechcomputers/node-red-pushover",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A Pushover API wrapper for Node-RED",
   "repository": {
     "type": "git",
@@ -27,6 +27,13 @@
     "email": "info@nanotechcomputers.co.za",
     "url": "https://github.com/NanotechComputers/node-red-pushover.git"
   },
+  "contributors": [
+    {
+      "name": "Kevin Deason",
+      "email": "kevin@deason.io",
+      "url": "https://github.com/NanotechComputers/node-red-pushover.git"
+    }
+  ],
   "scripts": {
     "test": "mocha \"test/**/*.spec.js\""
   },

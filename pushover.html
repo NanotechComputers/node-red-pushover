@@ -1,70 +1,73 @@
-<script type="text/x-red" data-template-name="pushover-keys">
-    <div class="form-row">
-        <label for="node-config-input-userKey"><i class="icon-bookmark"></i> User</label>
-        <input type="text" id="node-config-input-userKey">
+<script type="text/x-red" data-template-name="ntc-node-red-pushover-keys">
+    <div className="form-row">
+        <label htmlFor="node-config-input-userKey"><i className="icon-bookmark"></i> User</label>
+        <input type="text" id="node-config-input-userKey"  placeholder="Pushover User Key">
     </div>
-    <div class="form-row">
-        <label for="node-config-input-token"><i class="icon-bookmark"></i> Token</label>
-        <input type="text" id="node-config-input-token">
+    <div className="form-row">
+        <label htmlFor="node-config-input-token"><i className="icon-bookmark"></i> Token</label>
+        <input type="text" id="node-config-input-token" placeholder="Pushover Token">
     </div>
     <br/>
-    <div class="form-row">
-        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-config-input-name" placeholder="My Pushover Key">
+    <div className="form-row">
+        <label htmlFor="node-config-input-name"><i className="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Pushover Credentials">
     </div>
+
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('pushover-keys',{
+    RED.nodes.registerType('ntc-node-red-pushover-keys', {
         category: 'config',
         defaults: {
-            name: {value:""},
+            name: {value: ""},
         },
         credentials: {
-            userKey: {type:"text",required:true},
-            token: {type: "text",required:true}
+            userKey: {type: "text", required: true},
+            token: {type: "text", required: true}
         },
-        label: function() {
-            return this.name || "Pushover Keys";
-        }
+        label: function () {
+            return this.name || "Pushover Credentials";
+        },
+        paletteLabel: "Pushover Credentials"
     });
 </script>
 
-<script type="text/x-red" data-template-name="pushover-notifications">
-    <div class="form-row">
-        <label for="node-input-title"><i class="fa fa-bell"></i> Title</label>
+<script type="text/x-red" data-template-name="ntc-node-red-pushover-notifications">
+    <div className="form-row">
+        <label htmlFor="node-input-title"><i className="fa fa-bell"></i> Title</label>
         <input type="text" id="node-input-title" placeholder="Node-RED Notification">
     </div>
-    <div class="form-row">
-        <label for="node-input-keys"><i class="fa fa-user"></i> Keys</label>
-        <input type="text" id="node-input-keys">
+    <div className="form-row">
+        <label htmlFor="node-input-keys"><i className="fa fa-user"></i> Keys</label>
+        <input type="text" id="node-input-keys"  placeholder="Pushover Credentials">
     </div>
     <br/>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <div className="form-row">
+        <label htmlFor="node-input-name"><i className="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
-    <div class="form-tips" id="node-tip">
+    <div className="form-tips" id="node-tip">
         A <code>msg.payload</code> is required to send as the message of the notification.<br>
         See help for more available options.
     </div>
+
 </script>
 
-<script type="text/x-red" data-help-name="pushover-notifications">
+<script type="text/x-red" data-help-name="ntc-node-red-pushover-notifications">
     <img src='icons/help-pushover-logo.png'/>
-    <p>Uses Pushover to push notification to a device that has the Pushover app installed.</p>
-    <p>Supports rich notification with image attachment.</p>
+    <p>Uses Pushover to push a notification to a device that has the Pushover app installed.</p>
+    <p>Supports rich text notifications with an image attachment.</p>
     <h3>Required Inputs</h3>
-    <dl class="message-properties">
+    <dl className="message-properties">
         <dt>msg.payload</dt>
-        <dd>The message of the notification, supports a <a href="https://pushover.net/api#html">few html tags</a></dd>
+        <dd>The message of the notification, supports a few <a href="https://pushover.net/api#html">html tags</a></dd>
     </dl>
     <h3>Optional Inputs</h3>
-    <dl class="message-properties">
+    <dl className="message-properties">
         <dt>msg.topic</dt>
         <dd>This will be used as the title of the notification if <b>Title</b> is not set</dd>
         <dt>msg.image</dt>
-        <dd>The URL of the image in notification. Local file path or http(s) url</dd>
+        <dd>The URL of the image in the notification, supports a local file path or http(s) url</dd>
         <dt>msg.url</dt>
         <dd>Can add an url to your notification</dd>
         <dt>msg.url_title</dt>
@@ -72,99 +75,104 @@
         <dt>msg.priority</dt>
         <dd>-2/-1/1/2. Default: 0 (normal)<br>If the priority is 2 (emergency), you should provide <code>msg.retry</code> and <code>msg.expire</code>. <br><a href="https://pushover.net/api#priority">see explains</a></dd>
         <dt>msg.device</dt>
-        <dd>Default for all device if not provided. Separated by a comma</dd>
+        <dd>Default for all devices if not provided. Separated by a comma</dd>
         <dt>msg.sound</dt>
         <dd>Name of the notification sound, <a href="https://pushover.net/api#sounds">see the list</a></dd>
         <dt>msg.timestamp</dt>
         <dd>An unix timestamp to specific the date time of your notification</dd>
     </dl>
+
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('pushover-notifications',{
-        category: 'mobile-output',
+    RED.nodes.registerType('ntc-node-red-pushover-notifications', {
+        category: 'Pushover',
         defaults: {
-            keys: {type: "pushover-keys", required: true},
-            title: {value:""},
-            name: {value:""}
+            keys: {type: "ntc-node-red-pushover-keys", required: true},
+            title: {value: ""},
+            name: {value: ""}
         },
-        color:"#209BF0",
-        inputs:1,
-        outputs:0,
+        color: "#209BF0",
+        inputs: 1,
+        outputs: 0,
         icon: "pushover.svg",
         align: "right",
-        label: function() {
-            return this.name || "pushover-notifications";
-        }
+        label: function () {
+            return this.name || "Notifications";
+        },
+        paletteLabel: "Notifications"
     });
 </script>
 
-<script type="text/x-red" data-template-name="pushover-glances">
-    <div class="form-row">
-        <label for="node-input-keys"><i class="fa fa-user"></i> Keys</label>
-        <input type="text" id="node-input-keys">
+<script type="text/x-red" data-template-name="ntc-node-red-pushover-glances">
+    <div className="form-row">
+        <label htmlFor="node-input-keys"><i className="fa fa-user"></i> Keys</label>
+        <input type="text" id="node-input-keys" placeholder="Pushover Credentials">
     </div>
     <br/>
-    <div class="form-row">
-        <label for="node-input-title"><i class="fa fa-align-left"></i> Title</label>
-        <input type="text" id="node-input-title" placeholder="Leave blank will use msg.topic">
+    <div className="form-row">
+        <label htmlFor="node-input-title"><i className="fa fa-align-left"></i> Title</label>
+        <input type="text" id="node-input-title" placeholder="Leave blank to use msg.topic">
     </div>
-    <div class="form-row">
-        <label for="node-input-text"><i class="fa fa-align-left"></i> Text</label>
-        <input type="text" id="node-input-text" placeholder="Leave blank will use msg.payload">
+    <div className="form-row">
+        <label htmlFor="node-input-text"><i className="fa fa-align-left"></i> Text</label>
+        <input type="text" id="node-input-text" placeholder="Leave blank to use msg.payload">
     </div>
-    <div class="form-row">
-        <label for="node-input-subtext"><i class="fa fa-align-left"></i> Subtext</label>
-        <input type="text" id="node-input-subtext" placeholder="Leave blank will use msg.subtext">
+    <div className="form-row">
+        <label htmlFor="node-input-subtext"><i className="fa fa-align-left"></i> Subtext</label>
+        <input type="text" id="node-input-subtext" placeholder="Leave blank to use msg.subtext">
     </div>
     <br/>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <div className="form-row">
+        <label htmlFor="node-input-name"><i className="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
-    <div class="form-tips" id="node-tip">
+    <div className="form-tips" id="node-tip">
         See help for more available inputs.
     </div>
+
 </script>
 
-<script type="text/x-red" data-help-name="pushover-glances">
+<script type="text/x-red" data-help-name="ntc-node-red-pushover-glances">
     <img src='icons/help-pushover-glances-preview.jpg'/>
-    <p>With Pushover's Glances API, you can push small bits of data directly to a constantly-updated screen, referred to as a widget, such as a complication on your smart watch or a widget on your phone's lock screen. </p>
+    <p>With Pushover's Glances API, you can push small bits of data directly to a constantly-updated screen, referred to as a widget, such as an application on your smart watch or a widget on your phone's lock screen. </p>
     <h3>Available Inputs</h3>
-    <dl class="message-properties">
+    <dl className="message-properties">
         <img src='icons/help-pushover-glances-props.png'/>
-        <dt>msg.topic<span class="property-type">string (100 characters)</span></dt>
+        <dt>msg.topic<span className="property-type">string (100 characters)</span></dt>
         <dd>This will be used as the title if <b>Title</b> is not set</dd>
-        <dt>msg.payload<span class="property-type">string (100 characters)</span></dt>
+        <dt>msg.payload<span className="property-type">string (100 characters)</span></dt>
         <dd>The main line</dd>
-        <dt>msg.subtext<span class="property-type">string (100 characters)</span></dt>
+        <dt>msg.subtext<span className="property-type">string (100 characters)</span></dt>
         <dd>The second line</dd>
-        <dt>msg.count<span class="property-type">integer (may be negative)</span></dt>
+        <dt>msg.count<span className="property-type">integer (may be negative)</span></dt>
         <dd>The number</dd>
-        <dt>msg.percent<span class="property-type">integer (0 to 100)</span></dt>
+        <dt>msg.percent<span className="property-type">integer (0 to 100)</span></dt>
         <dd>The progress bar/circle</dd>
-        <dt>msg.device<span class="property-type">string</span></dt>
+        <dt>msg.device<span className="property-type">string</span></dt>
         <dd>Device name, default for all</dd>
     </dl>
+
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('pushover-glances',{
-        category: 'mobile-output',
+    RED.nodes.registerType('ntc-node-red-pushover-glances', {
+        category: 'Pushover',
         defaults: {
-            keys: {type: "pushover-keys", required: true},
-            title: {value:""},
-            text: {value:""},
-            subtext: {value:""},
-            name: {value:""}
+            keys: {type: "ntc-node-red-pushover-keys", required: true},
+            title: {value: ""},
+            text: {value: ""},
+            subtext: {value: ""},
+            name: {value: ""}
         },
-        color:"#209BF0",
-        inputs:1,
-        outputs:0,
+        color: "#209BF0",
+        inputs: 1,
+        outputs: 0,
         icon: "pushover-glances.svg",
         align: "right",
-        label: function() {
-            return this.name || "pushover-glances";
-        }
+        label: function () {
+            return this.name || "Glances";
+        },
+        paletteLabel: "Glances"
     });
 </script>

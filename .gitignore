@@ -65,3 +65,6 @@ typings/
 
 # Jetbrains
 /.idea/*
+
+# Local Docker for Testing
+docker/*

@@ -1,0 +1,70 @@
+[
+    {
+        "id": "9cf5d87e6626a53d",
+        "type": "tab",
+        "label": "Pushover Notification",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "7378e9a06b4ebc48",
+        "type": "group",
+        "z": "9cf5d87e6626a53d",
+        "name": "Pushover Notification",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "dd0e6b2c5960641a",
+            "89f40d9c87ca0686"
+        ],
+        "x": 34,
+        "y": 39,
+        "w": 452,
+        "h": 82
+    },
+    {
+        "id": "dd0e6b2c5960641a",
+        "type": "inject",
+        "z": "9cf5d87e6626a53d",
+        "g": "7378e9a06b4ebc48",
+        "name": "Inject Message",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "This is a test message",
+        "payloadType": "str",
+        "x": 160,
+        "y": 80,
+        "wires": [
+            [
+                "89f40d9c87ca0686"
+            ]
+        ]
+    },
+    {
+        "id": "89f40d9c87ca0686",
+        "type": "ntc-node-red-pushover-notifications",
+        "z": "9cf5d87e6626a53d",
+        "g": "7378e9a06b4ebc48",
+        "keys": "6a74091f37ccc200",
+        "title": "Notification from Node-RED",
+        "name": "Test Notification",
+        "x": 380,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "6a74091f37ccc200",
+        "type": "ntc-node-red-pushover-keys",
+        "name": ""
+    }
+]

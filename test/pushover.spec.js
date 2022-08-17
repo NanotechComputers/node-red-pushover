@@ -16,12 +16,12 @@ describe('pushover', function () {
         helper.stopServer(done);
     });
 
-    it('should load pushover-keys', function (done) {
-        const flow = [{id: "n1", type: "pushover-keys", name: "pushover-keys"}];
+    it('should load ntc-node-red-pushover-keys', function (done) {
+        const flow = [{id: "n1", type: "ntc-node-red-pushover-keys", name: "ntc-node-red-pushover-keys"}];
         helper.load(pushover, flow, function () {
             const n1 = helper.getNode("n1");
             try {
-                n1.should.have.property('name', 'pushover-keys');
+                n1.should.have.property('name', 'ntc-node-red-pushover-keys');
                 done();
             } catch (err) {
                 done(err);
@@ -29,12 +29,12 @@ describe('pushover', function () {
         });
     });
 
-    it('should load pushover-notifications', function (done) {
-        const flow = [{id: "n2", type: "pushover-notifications", name: "pushover-notifications"}];
+    it('should load ntc-node-red-pushover-notifications', function (done) {
+        const flow = [{id: "n2", type: "ntc-node-red-pushover-notifications", name: "ntc-node-red-pushover-notifications"}];
         helper.load(pushover, flow, function () {
             const n2 = helper.getNode("n2");
             try {
-                n2.should.have.property('name', 'pushover-notifications');
+                n2.should.have.property('name', 'ntc-node-red-pushover-notifications');
                 done();
             } catch (err) {
                 done(err);
@@ -42,12 +42,12 @@ describe('pushover', function () {
         });
     });
 
-    it('should load pushover-glances', function (done) {
-        const flow = [{id: "n3", type: "pushover-glances", name: "pushover-glances"}];
+    it('should load ntc-node-red-pushover-glances', function (done) {
+        const flow = [{id: "n3", type: "ntc-node-red-pushover-glances", name: "ntc-node-red-pushover-glances"}];
         helper.load(pushover, flow, function () {
             const n3 = helper.getNode("n3");
             try {
-                n3.should.have.property('name', 'pushover-glances');
+                n3.should.have.property('name', 'ntc-node-red-pushover-glances');
                 done();
             } catch (err) {
                 done(err);

@@ -1,3 +1,5 @@
+const axios = require("axios");
+const fs = require("fs");
 module.exports = function (RED) {
     'use strict';
     const axios = require('axios');
@@ -10,41 +12,60 @@ module.exports = function (RED) {
     }
 
     function PushoverNotificationsNode(n) {
-        function checkFetchStatus(res) {
-            if (res.ok) { // res.status >= 200 && res.status < 300
-                return res;
+        function handleAxiosSuccess(res, done) {
+            const data = res?.data; // Example response: {"status":1,"request":"ddc01c7d-e908-4107-a2ab-e8c82ce7db01"}
+            const status = data?.status;
+            const request = data?.request;
+            if (res.status === 200 && status === 1) {
+                node.log(`Pushover notification sent successfully. Status: ${status}, Request: ${request}`);
+                done();
             } else {
-                if (done) {
-                    done(res.response.text());
-                } else {
-                    node.error('Pushover error: ' + res.response);
-                }
+                done(`Unknown Pushover error: ${JSON.stringify(data)}`);
             }
+            return res;
         }
+
+        function handleAxiosError(error, done) {
+            const response = error?.response;
+            const data = response?.data;
+            const status = data?.status;
+            const request = data?.request;
+            const errors = data?.errors;
+
+            const msg = `Pushover error. Status: ${status}, Request: ${request}, Errors: ${errors?.join(', ')}`;
+            done(msg);
+
+            return response;
+        }
+
         RED.nodes.createNode(this, n);
+
         this.title = n.title;
+
         this.keys = RED.nodes.getCredentials(n.keys);
-        if (this.keys) {
-            if (!this.keys.userKey) {
-                this.error('No pushover user key');
-            }
-            if (!this.keys.token) {
-                this.error('No pushover token');
-            }
+        if (!this.keys) {
+            this.error('Pushover credentials have not been set up');
         } else {
-            this.error('No pushover keys configuration');
+            if (!this.keys.userKey) {
+                this.error('Pushover user key is invalid');
+            }
+
+            if (!this.keys.token) {
+                this.error('Pushover token is invalid');
+            }
         }
 
         const node = this;
 
         this.on('input', function (msg, send, done) {
             if (!msg.payload) {
-                throw 'Pushover error: payload has no string';
+                throw 'Pushover notifications expects a payload of type string or object';
             } else if (typeof (msg.payload) == 'object') {
                 msg.payload = JSON.stringify(msg.payload);
             } else {
                 msg.payload = String(msg.payload);
             }
+
             if (msg.priority) {
                 switch (msg.priority) {
                     case -2:
@@ -95,18 +116,8 @@ module.exports = function (RED) {
                 let hasProtocol = msg.image.match(/^(\w+:\/\/)/igm);
                 if (hasProtocol) {
                     return axios.get(msg.image)
-                        .then(checkFetchStatus)
-                        .then(res => {
-                            node.log('pushover POST succeeded:\n' + JSON.stringify(res));
-                            if (done) {
-                                1
-                                done();
-                            }
-                        })
-                        .catch(function (error) {
-                            // handle error
-                            console.log(error);
-                        })
+                        .then((res) => handleAxiosSuccess(res, done))
+                        .catch((error) => handleAxiosError(error, done))
                 } else {
                     return fs.createReadStream(msg.image);
                 }
@@ -115,27 +126,16 @@ module.exports = function (RED) {
             function push(form) {
                 let pushoverAPI = 'https://api.pushover.net/1/messages.json?html=1';
                 axios.postForm(pushoverAPI, form)
-                    .then(checkFetchStatus)
-                    .then(res => {
-                        node.log('pushover POST succeeded:\n' + JSON.stringify(res));
-                        if (done) {
-                            done();
-                        }
-                    })
-                    .catch(error => {
-                        if (done) {
-                            done(error.message);
-                        } else {
-                            node.error('Error parsing json: ' + error.message);
-                        }
-                    })
+                    .then((res) => handleAxiosSuccess(res, done))
+                    .catch((error) => handleAxiosError(error, done))
             }
+
             push(notification);
         });
     }
 
     function PushoverGlancesNode(n) {
-        function checkFetchStatus(res) {
+        function checkFetchStatus(res, done) {
             if (res.ok) { // res.status >= 200 && res.status < 300
                 return res;
             } else {
@@ -146,6 +146,7 @@ module.exports = function (RED) {
                 }
             }
         }
+
         RED.nodes.createNode(this, n);
 
         this.keys = RED.nodes.getCredentials(n.keys);
@@ -201,7 +202,7 @@ module.exports = function (RED) {
             function push(form) {
                 let pushoverAPI = 'https://api.pushover.net/1/glances.json';
                 axios.postForm(pushoverAPI, form)
-                    .then(checkFetchStatus)
+                    .then(checkFetchStatus, done)
                     .then(res => {
                         node.log('pushover POST succeeded:\n' + JSON.stringify(res));
                         if (done) {
@@ -225,12 +226,14 @@ module.exports = function (RED) {
         });
     }
 
-    RED.nodes.registerType('pushover-keys', PushoverKeys, {
+    RED.nodes.registerType('ntc-node-red-pushover-keys', PushoverKeys, {
         credentials: {
             userKey: {type: 'text'},
             token: {type: 'text'}
         }
     });
-    RED.nodes.registerType('pushover-notifications', PushoverNotificationsNode);
-    RED.nodes.registerType('pushover-glances', PushoverGlancesNode);
+
+    RED.nodes.registerType('ntc-node-red-pushover-notifications', PushoverNotificationsNode);
+
+    RED.nodes.registerType('ntc-node-red-pushover-glances', PushoverGlancesNode);
 };
