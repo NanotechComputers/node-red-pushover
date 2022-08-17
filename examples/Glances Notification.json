@@ -1,0 +1,72 @@
+[
+  {
+    "id": "41e291c759dd14ac",
+    "type": "tab",
+    "label": "Glances Notification",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "04f484ef1e206306",
+    "type": "group",
+    "z": "41e291c759dd14ac",
+    "name": "Glances Notification",
+    "style": {
+      "label": true
+    },
+    "nodes": [
+      "f7232e517af724be",
+      "62fe41aa357bf24c"
+    ],
+    "x": 34,
+    "y": 39,
+    "w": 432,
+    "h": 82
+  },
+  {
+    "id": "f7232e517af724be",
+    "type": "ntc-node-red-pushover-glances",
+    "z": "41e291c759dd14ac",
+    "g": "04f484ef1e206306",
+    "keys": "6a74091f37ccc200",
+    "title": "Notification from Node-RED",
+    "text": "Glances Test",
+    "subtext": "Glances Subtext",
+    "name": "Test Glances",
+    "x": 370,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "62fe41aa357bf24c",
+    "type": "inject",
+    "z": "41e291c759dd14ac",
+    "g": "04f484ef1e206306",
+    "name": "Inject Message",
+    "props": [
+      {
+        "p": "timestamp",
+        "v": "",
+        "vt": "date"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 160,
+    "y": 80,
+    "wires": [
+      [
+        "f7232e517af724be"
+      ]
+    ]
+  },
+  {
+    "id": "6a74091f37ccc200",
+    "type": "ntc-node-red-pushover-keys",
+    "name": ""
+  }
+]

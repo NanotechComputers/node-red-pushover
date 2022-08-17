@@ -1,6 +1,7 @@
 @NanotechComputers/node-red-pushover
 ======================
 [![npm](https://img.shields.io/npm/v/@nanotechcomputers/node-red-pushover?style=flat-square)](https://www.npmjs.com/package/@nanotechcomputers/node-red-pushover)
+[![codecov](https://codecov.io/gh/NanotechComputers/node-red-pushover/branch/main/graph/badge.svg?token=006595LALM)](https://codecov.io/gh/NanotechComputers/node-red-pushover)
 
 A [Pushover](https://www.pushover.net/) API wrapper for Node-RED.
 ____

@@ -1,5 +1,3 @@
-const axios = require("axios");
-const fs = require("fs");
 module.exports = function (RED) {
     'use strict';
     const axios = require('axios');
@@ -12,6 +10,7 @@ module.exports = function (RED) {
     }
 
     function PushoverNotificationsNode(n) {
+
         function handleAxiosSuccess(res, done) {
             const data = res?.data; // Example response: {"status":1,"request":"ddc01c7d-e908-4107-a2ab-e8c82ce7db01"}
             const status = data?.status;
@@ -31,11 +30,16 @@ module.exports = function (RED) {
             const status = data?.status;
             const request = data?.request;
             const errors = data?.errors;
-
             const msg = `Pushover error. Status: ${status}, Request: ${request}, Errors: ${errors?.join(', ')}`;
             done(msg);
 
             return response;
+        }
+
+        function sendPushRequest(url, form, done) {
+            axios.postForm(url, form)
+                .then((res) => handleAxiosSuccess(res, done))
+                .catch((error) => handleAxiosError(error, done))
         }
 
         RED.nodes.createNode(this, n);
@@ -123,46 +127,61 @@ module.exports = function (RED) {
                 }
             }
 
-            function push(form) {
-                let pushoverAPI = 'https://api.pushover.net/1/messages.json?html=1';
-                axios.postForm(pushoverAPI, form)
-                    .then((res) => handleAxiosSuccess(res, done))
-                    .catch((error) => handleAxiosError(error, done))
-            }
-
-            push(notification);
+            const url = 'https://api.pushover.net/1/messages.json?html=1';
+            sendPushRequest(url, notification, done);
         });
     }
 
     function PushoverGlancesNode(n) {
-        function checkFetchStatus(res, done) {
-            if (res.ok) { // res.status >= 200 && res.status < 300
-                return res;
+
+        function handleAxiosSuccess(res, done) {
+            const data = res?.data; // Example response: {"status":1,"request":"ddc01c7d-e908-4107-a2ab-e8c82ce7db01"}
+            const status = data?.status;
+            const request = data?.request;
+            if (res.status === 200 && status === 1) {
+                node.log(`Pushover notification sent successfully. Status: ${status}, Request: ${request}`);
+                done();
             } else {
-                if (done) {
-                    done(res.response.text());
-                } else {
-                    node.error('Pushover error: ' + res.response);
-                }
+                done(`Unknown Pushover error: ${JSON.stringify(data)}`);
             }
+            return res;
+        }
+
+        function handleAxiosError(error, done) {
+            const response = error?.response;
+            const data = response?.data;
+            const status = data?.status;
+            const request = data?.request;
+            const errors = data?.errors;
+            const msg = `Pushover error. Status: ${status}, Request: ${request}, Errors: ${errors?.join(', ')}`;
+            done(msg);
+
+            return response;
+        }
+
+        function sendPushRequest(url, form, done) {
+            axios.postForm(url, form)
+                .then((res) => handleAxiosSuccess(res, done))
+                .catch((error) => handleAxiosError(error, done))
         }
 
         RED.nodes.createNode(this, n);
 
-        this.keys = RED.nodes.getCredentials(n.keys);
         this.title = n.title;
         this.text = n.text;
         this.subtext = n.subtext;
 
-        if (this.keys) {
-            if (!this.keys.userKey) {
-                this.error('No pushover user key');
-            }
-            if (!this.keys.token) {
-                this.error('No pushover token');
-            }
+        this.keys = RED.nodes.getCredentials(n.keys);
+        if (!this.keys) {
+            this.error('Pushover credentials have not been set up');
         } else {
-            this.error('No pushover keys configuration');
+            if (!this.keys.userKey) {
+                this.error('Pushover user key is invalid');
+            }
+
+            if (!this.keys.token) {
+                this.error('Pushover token is invalid');
+            }
         }
 
         const node = this;
@@ -199,27 +218,9 @@ module.exports = function (RED) {
                 }
             }
 
-            function push(form) {
-                let pushoverAPI = 'https://api.pushover.net/1/glances.json';
-                axios.postForm(pushoverAPI, form)
-                    .then(checkFetchStatus, done)
-                    .then(res => {
-                        node.log('pushover POST succeeded:\n' + JSON.stringify(res));
-                        if (done) {
-                            done();
-                        }
-                    })
-                    .catch(error => {
-                        if (done) {
-                            done(error.message);
-                        } else {
-                            node.error('Error parsing json: ' + error.message);
-                        }
-                    })
-            }
-
+            const url = "https://api.pushover.net/1/glances.json";
             if (Object.keys(glances).length > 2) {
-                push(glances);
+                sendPushRequest(url, glances, done);
             } else {
                 node.warn('Pushover glances has nothing to send');
             }
@@ -232,8 +233,6 @@ module.exports = function (RED) {
             token: {type: 'text'}
         }
     });
-
     RED.nodes.registerType('ntc-node-red-pushover-notifications', PushoverNotificationsNode);
-
     RED.nodes.registerType('ntc-node-red-pushover-glances', PushoverGlancesNode);
 };
