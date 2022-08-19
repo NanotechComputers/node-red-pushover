@@ -1,1 +1,11 @@
-*.sketch
+.github
+coverage
+docker
+node_modules
+test/*
+assets.sketch
+.gitignore
+.git
+.tsconfig
+.idea
+.vscode
