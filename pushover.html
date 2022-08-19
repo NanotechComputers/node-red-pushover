@@ -94,7 +94,7 @@
         },
         color: "#209BF0",
         inputs: 1,
-        outputs: 0,
+        outputs: 1,
         icon: "pushover.svg",
         align: "right",
         label: function () {
@@ -174,5 +174,56 @@
             return this.name || "Glances";
         },
         paletteLabel: "Glances"
+    });
+</script>
+
+
+<script type="text/x-red" data-template-name="ntc-node-red-pushover-receipt-cancel">
+    <div className="form-row">
+        <label htmlFor="node-input-keys"><i className="fa fa-user"></i> Keys</label>
+        <input type="text" id="node-input-keys" placeholder="Pushover Credentials">
+    </div>
+    <br/>
+    <div className="form-row">
+        <label htmlFor="node-input-text"><i className="fa fa-align-left"></i> Receipt Id</label>
+        <input type="text" id="node-input-text" placeholder="Leave blank to use msg.payload">
+    </div>
+    <div className="form-tips" id="node-tip">
+        A <code>msg.payload</code> is required to send as the Receipt Id to cancel.
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="ntc-node-red-pushover-receipt-cancel">
+    <img src='icons/help-pushover-logo.png'/>
+    <p>
+        An emergency-priority notification will continue to be sent to devices until it reaches its original expire value.
+     </p>
+    <p>
+        To cancel an emergency-priority notification early, you can use this node.
+     </p>
+    <h3>Required Inputs</h3>
+    <dl className="message-properties">
+        <dt>msg.payload</dt>
+        <dd>The Receipt Id to cancel</dd>
+    </dl>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('ntc-node-red-pushover-receipt-cancel', {
+        category: 'Pushover',
+        defaults: {
+            keys: {type: "ntc-node-red-pushover-keys", required: true},
+            title: {value: ""},
+            name: {value: ""}
+        },
+        color: "#209BF0",
+        inputs: 1,
+        outputs: 1,
+        icon: "pushover.svg",
+        align: "right",
+        label: function () {
+            return this.name || "Cancel Receipt";
+        },
+        paletteLabel: "Cancel"
     });
 </script>

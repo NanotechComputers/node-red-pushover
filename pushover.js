@@ -1,5 +1,7 @@
 const fs = require('fs');
 const pushover = require('./lib/pushover');
+const messages = require('./lib/messages');
+const receipts = require('./lib/receipts');
 
 module.exports = function (RED) {
     'use strict';
@@ -21,60 +23,6 @@ module.exports = function (RED) {
         pushover.checkCredentials(node);
 
         node.on('input', function (msg, send, done) {
-            if (!msg.payload) {
-                throw 'Pushover notifications expects a payload of type string or object';
-            } else if (typeof (msg.payload) == 'object') {
-                msg.payload = JSON.stringify(msg.payload);
-            } else {
-                msg.payload = String(msg.payload);
-            }
-
-            if (msg.priority) {
-                switch (msg.priority) {
-                    case -2:
-                    case -1:
-                    case 0:
-                    case 1:
-                        break;
-                    case 2:
-                        if (!msg.retry || !msg.expire) {
-                            throw 'Pushover error: missing msg.retry or msg.expire';
-                        } else {
-                            if (msg.retry < 30) {
-                                throw 'Pushover error: msg.retry must at least 30';
-                            }
-                            if (msg.expire > 10800) {
-                                throw 'Pushover error: msg.expire must less than 10800';
-                            }
-                        }
-                        break;
-                    default:
-                        throw 'Pushover error: priority out of range';
-                }
-            }
-
-            let notification = {
-                'title': node.title || msg.topic || 'Node-RED Notification',
-                'token': node?.keys?.token,
-                'user': node?.keys?.userKey,
-                'message': msg.payload,
-                'attachment': msg.image ? parseImageUrl() : null,
-                'device': msg.device,
-                'url': msg.url,
-                'url_title': msg.url_title,
-                'priority': msg.priority,
-                'retry': msg.retry,
-                'expire': msg.expire,
-                'sound': msg.sound,
-                'timestamp': msg.timestamp
-            };
-
-            for (let k in notification) {
-                if (!notification[k]) {
-                    delete notification[k];
-                }
-            }
-
             function parseImageUrl() {
                 let hasProtocol = msg.image.match(/^(\w+:\/\/)/igm);
                 if (hasProtocol) {
@@ -84,8 +32,45 @@ module.exports = function (RED) {
                 }
             }
 
-            const url = 'https://api.pushover.net/1/messages.json?html=1';
-            pushover.postForm(url, notification, node, done).then();
+            let message = new messages(node, node?.keys?.userKey, node?.keys?.token, done);
+            const title = node.title || msg.topic || 'Node-RED Notification'
+            message.setTitle(title);
+            message.setMessage(msg.payload)
+            message.setAttachment(msg.image ? parseImageUrl() : null)
+            message.setDevice(msg.device)
+            message.setHtml(msg.html)
+            message.setUrl(msg.url, msg.url_title)
+            if (msg.priority) {
+                message.setPriority(msg.priority, msg.retry, msg.expire)
+            }
+            message.setSound(msg.sound)
+            message.setTimestamp(msg.timestamp)
+
+            // delete unused properties from the message object
+            for (let k in message) {
+                if (!message[k]) {
+                    delete message[k];
+                }
+            }
+            message.send().then((x)=> node.send(x));
+        });
+    }
+
+    function PushoverReceiptCancelNode(n) {
+
+        RED.nodes.createNode(this, n);
+        const node = this;
+
+        node.title = n.title;
+        node.keys = RED.nodes.getCredentials(n.keys);
+
+        pushover.checkCredentials(node);
+
+        node.on('input', function (msg, send, done) {
+
+            let receipt = new receipts(node, node?.keys?.userKey, node?.keys?.token, done);
+            receipt.setReceiptId(msg.payload);
+            receipt.send().then((x)=> node.send(x));
         });
     }
 
@@ -148,6 +133,9 @@ module.exports = function (RED) {
             token: {type: 'text'}
         }
     });
+
     RED.nodes.registerType('ntc-node-red-pushover-notifications', PushoverNotificationsNode);
+    RED.nodes.registerType('ntc-node-red-pushover-receipt-cancel', PushoverReceiptCancelNode);
+
     RED.nodes.registerType('ntc-node-red-pushover-glances', PushoverGlancesNode);
 };
