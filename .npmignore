@@ -9,3 +9,4 @@ assets.sketch
 .tsconfig
 .idea
 .vscode
+*.spec.js

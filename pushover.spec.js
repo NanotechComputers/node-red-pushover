@@ -1,5 +1,5 @@
 const helper = require("node-red-node-test-helper");
-const pushover = require("../pushover.js");
+const pushover = require("./pushover.js");
 
 helper.init(require.resolve('node-red'));
 

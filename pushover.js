@@ -88,8 +88,8 @@ module.exports = function (RED) {
 
         node.on('input', function (msg, send, done) {
 
-            msg.count = parseInt(msg.count);
-            msg.percent = Math.min(100, Math.max(0, parseInt(msg.percent)));
+            const count = parseInt(msg.count);
+            const percent = Math.min(100, Math.max(0, parseInt(msg.percent)))
 
             let glances = {
                 'token': node.keys.token,
@@ -97,8 +97,8 @@ module.exports = function (RED) {
                 'title': node.title || msg.topic,
                 'text': node.text || msg.payload,
                 'subtext': node.subtext || msg.subtext,
-                'count': msg.count,
-                'percent': msg.percent,
+                'count': count,
+                'percent': percent,
                 'device': msg.device
             };
 
