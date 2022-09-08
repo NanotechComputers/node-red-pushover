@@ -1,6 +1,6 @@
 {
   "name": "@nanotechcomputers/node-red-pushover",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A Pushover API wrapper for Node-RED",
   "repository": {
     "type": "git",
@@ -42,8 +42,8 @@
   },
   "devDependencies": {
     "@jest/globals": "^28.1.3",
-    "@types/jest": "^28.1.7",
-    "@types/node": "^18.7.8",
+    "@types/jest": "^28.1.8",
+    "@types/node": "^18.7.16",
     "@types/node-red": "^1.2.1",
     "jest": "^28.1.3",
     "node-red": "^3.0.2",
