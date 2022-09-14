@@ -2,6 +2,8 @@ const fs = require('fs');
 const pushover = require('./lib/pushover');
 const messages = require('./lib/messages');
 const receipts = require('./lib/receipts');
+const axios = require("axios");
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = function (RED) {
     'use strict';
@@ -23,20 +25,22 @@ module.exports = function (RED) {
         pushover.checkCredentials(node);
 
         node.on('input', function (msg, send, done) {
-            function parseImageUrl() {
-                let hasProtocol = msg.image.match(/^(\w+:\/\/)/igm);
-                if (hasProtocol) {
-                    return pushover.get(msg.image, node, done);
-                } else {
-                    return fs.createReadStream(msg.image);
-                }
+            function getLocalImage(image) {
+                const stream = fs.createReadStream(image);
+                stream.on('error', function (error) {
+                    done(error)
+                });
+                return stream;
+            }
+
+            function getRemoteImage(image) {
+                return axios.get(image, {responseType: 'stream'});
             }
 
             let message = new messages(node, node?.keys?.userKey, node?.keys?.token, done);
             const title = node.title || msg.topic || 'Node-RED Notification'
             message.setTitle(title);
             message.setMessage(msg.payload)
-            message.setAttachment(msg.image ? parseImageUrl() : null)
             message.setDevice(msg.device)
             message.setHtml(msg.html)
             message.setUrl(msg.url, msg.url_title)
@@ -52,7 +56,29 @@ module.exports = function (RED) {
                     delete message[k];
                 }
             }
-            message.send().then((x)=> node.send(x));
+            if (msg.image) {
+                const isLocal = !msg.image.match(/^(\w+:\/\/)/igm);
+                if (isLocal) {
+                    const image = getLocalImage(msg.image)
+                    if(image){
+                        message.setAttachment(uuidv4(), image); // TODO: Perhaps get image filename
+                    }
+                    message.sendForm().then((x) => node.send(x));
+                } else {
+                    const parseImage = getRemoteImage(msg.image);
+                    parseImage.then((response) => {
+                        if(response?.data)
+                        {
+                            message.setAttachment(uuidv4(), response?.data); // TODO: Perhaps get image filename
+                        }
+                        message.sendForm().then((x) => node.send(x));
+                    }).catch((error) => {
+                        console.log('error', error);
+                    });
+                }
+            } else {
+                message.send().then((x) => node.send(x));
+            }
         });
     }
 
@@ -70,7 +96,7 @@ module.exports = function (RED) {
 
             let receipt = new receipts(node, node?.keys?.userKey, node?.keys?.token, done);
             receipt.setReceiptId(msg.payload);
-            receipt.send().then((x)=> node.send(x));
+            receipt.send().then((x) => node.send(x));
         });
     }
 
@@ -120,7 +146,7 @@ module.exports = function (RED) {
 
             const url = "https://api.pushover.net/1/glances.json";
             if (Object.keys(glances).length > 2) {
-                pushover.postForm(url, glances, node, done).then();
+                pushover.post(url, glances, node, done).then();
             } else {
                 node.warn('Pushover glances has nothing to send');
             }
